@@ -524,8 +524,10 @@ function pickWith(rnd, maxn, m){
 /* divine(last9, coinsOf, nextCode, range, timeInfo)
    - last9: 最近9期（时间升序）；coinsOf(d)->[币1背?,币2背?]
    - range: {frontMax, frontN, backMax, backN}
-   - timeInfo 可选: {y,m,d,hour} 下期开奖时间 → 按年月日时（公历简化，梅花易数法）起"起始卦"，
-     与前九期铜钱卦共同决定种子 */
+   - timeInfo 可选:
+       {y,m,d,hour}         开奖时间 → 按年月日时（公历简化，梅花易数法）起"起始卦"
+       {y,m,d,isBirthday:1} 生日 → 按生日起"生日卦"（上卦=年+月+日，下卦=年+月+日+月×日，动爻=和%6）
+     起始/生日卦与前九期铜钱卦共同决定种子 */
 function divine(last9, coinsOf, nextCode, range, timeInfo){
   const coins = [];
   last9.forEach(d => { const c = coinsOf(d); coins.push(c[0] ? 1 : 0, c[1] ? 1 : 0); });
@@ -542,15 +544,22 @@ function divine(last9, coinsOf, nextCode, range, timeInfo){
   const movingIdx = moving.map((m,i) => m ? YAO_NAME[i] : null).filter(Boolean);
   const moveMask = moving.reduce((a,m,i) => a + (m ? 1<<i : 0), 0);
 
-  // 开奖时间起始卦：上卦=(年+月+日)%8，下卦=(年+月+日+时辰)%8，动爻=(年+月+日+时辰)%6（先天卦数）
+  // 起始卦（开奖时间）或生日卦（梅花易数，公历简化）
   let timeGua = null, timeNum = 0;
   if(timeInfo && timeInfo.y){
-    const shichen = Math.floor(((timeInfo.hour + 1) % 24) / 2) + 1;   // 21点→亥时(12)
-    const s1 = timeInfo.y + timeInfo.m + timeInfo.d, s2 = s1 + shichen;
     const byNum = n => TRI.find(t => t.num === ((n - 1) % 8) + 1);
-    const uT = byNum(s1), lT = byNum(s2);
-    timeGua = { upper: uT, lower: lT, name: HEX64[uT.name][lT.name],
-                dongYao: ((s2 - 1) % 6) + 1, shichen, shichenName: SHICHEN[shichen - 1] };
+    if(timeInfo.isBirthday){
+      const s1 = timeInfo.y + timeInfo.m + timeInfo.d, s2 = s1 + timeInfo.m * timeInfo.d;
+      const uT = byNum(s1), lT = byNum(s2);
+      timeGua = { upper: uT, lower: lT, name: HEX64[uT.name][lT.name],
+                  dongYao: ((s2 - 1) % 6) + 1, isBirthday: true };
+    } else {
+      const shichen = Math.floor(((timeInfo.hour + 1) % 24) / 2) + 1;   // 21点→亥时(12)
+      const s1 = timeInfo.y + timeInfo.m + timeInfo.d, s2 = s1 + shichen;
+      const uT = byNum(s1), lT = byNum(s2);
+      timeGua = { upper: uT, lower: lT, name: HEX64[uT.name][lT.name],
+                  dongYao: ((s2 - 1) % 6) + 1, shichen, shichenName: SHICHEN[shichen - 1] };
+    }
     timeNum = timeInfo.y * 10000 + timeInfo.m * 100 + timeInfo.d;
   }
   const seed = (Number(nextCode) || 0) * 1000003 + timeNum * 7919
