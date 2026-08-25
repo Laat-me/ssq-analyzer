@@ -216,6 +216,9 @@
     </div>
   </div>
 
+  <h2>紫微娱乐选号 <span>ziwei-lite-v1 · 完整出生信息输入 · 固定规则生成，不是预测模型</span></h2>
+  <div class="card" id="ziweiPanel"></div>
+
   <h2>选号历史记录 <span>本地记录每期参考选号 · 开奖后自动对比命中（参考 dlt-analyzer 的 predictions 机制）</span></h2>
   <div class="pred-head">
     <div class="note" style="margin:0">📁 文件记录：由 <b>update.js</b> 生成并写入 <b>predictions.json</b>，随页面打包，<b>永久不丢</b>；💾 为浏览器本地补充记录（仅在文件无该期时生效）。开奖后运行 update.js 更新数据，命中数自动比对。</div>
@@ -230,6 +233,7 @@
 <script>__ECHARTS_JS__</script>
 <script>__CORE_JS__</script>
 <script>__LIUYAO_JS__</script>
+<script>__ZIWEI_JS__</script>
 <script>
 const RAW = __DATA_JSON__;                 // 最新在前
 const D = RAW.slice().reverse();           // 时间升序（旧 → 新）
@@ -635,6 +639,16 @@ function genTickets(){
 }
 document.getElementById('regenBtn').addEventListener('click', genTickets);
 genTickets();
+
+/* ---------- 紫微娱乐选号（文件记录优先，完整输入摘要） ---------- */
+(function(){
+  const z = (PRED_HIST.find(e=>e.issue===nextCode)||{}).tickets?.find(t=>t.name==='紫微娱乐');
+  const input = {calendar:'gregorian',year:1998,month:2,day:3,hour:12,gender:'unknown',timezone:'Asia/Shanghai',location:'未提供'};
+  const c = Ziwei.chart(input);
+  const red = z ? z.red : Ziwei.ticket(input,'ssq',nextCode).red;
+  const blue = z ? z.blue : Ziwei.ticket(input,'ssq',nextCode).blue;
+  document.getElementById('ziweiPanel').innerHTML = `<div class="grid2"><div><b>出生信息（默认）</b><p class="note">公历 ${input.year}-${String(input.month).padStart(2,'0')}-${String(input.day).padStart(2,'0')} · ${input.hour}:00 · 性别未提供 · 时区 ${input.timezone} · 地点未提供</p><p class="note">规则：${c.ruleVersion}（兼容娱乐排盘，不等同完整传统流派排盘）</p><p class="note">命宫：<b>${c.mingong}</b> · 身宫：<b>${c.shengong}</b> · 五行局：<b>${c.fiveElement}</b></p><p class="note">主星摘要：${c.stars.slice(0,6).map(s=>s.name+'→'+s.palace).join('、')}</p><p class="note">出生指纹：${c.birthFingerprint} · seed：${z?.seed||c.seed}</p></div><div class="ticket"><b style="color:var(--gold)">🔭 紫微娱乐 · 第 ${nextCode} 期</b><p class="note">固定出生输入 + 规则版本 + 期号哈希生成；不改变任何中奖概率</p><div class="balls" style="justify-content:center">${red.map(n=>`<div class="ball r sm">${String(n).padStart(2,'0')}</div>`).join('')}<span style="width:14px"></span><div class="ball b sm">${String(blue).padStart(2,'0')}</div></div><p class="note">⚠️ 这是可复现的娱乐映射，不是有效预测。</p></div></div>`;
+})();
 
 /* ---------- 六爻占卜号（玄学娱乐，确定性可复现；已纳入 predictions.json 记录） ---------- */
 (function(){

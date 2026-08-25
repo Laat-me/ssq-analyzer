@@ -61,18 +61,27 @@ async function main(){
     }
   }
   const nextCode = String(Number(merged[0].c) + 1);
+  const Ziwei = require('./ziwei.js');
+  const birthInput = {calendar:'gregorian',year:1998,month:2,day:3,hour:12,gender:'unknown',timezone:'Asia/Shanghai',location:'未提供'};
   if (!preds.some(p => p.issue === nextCode)){
-    const rng = SSQCore.mulberry32(Number(nextCode) || 20260816);   // 按期号定种子，记录可复现
+    const rng = SSQCore.mulberry32(Number(nextCode) || 20260816);
     const tickets = SSQCore.predictTickets(D.length, rng);
     preds.push({ issue: nextCode, time: new Date().toLocaleString('zh-CN'), tickets });
     console.log(`已生成下一期（${nextCode}）预测并追加到 predictions.json`);
   } else {
     console.log(`下一期（${nextCode}）预测已存在，不重复生成`);
   }
-  // 六爻占卜注（确定性玄学娱乐）：前九期起卦 + 下期开奖时间起始卦，补进/刷新当期未验证记录
-  const LiuYao = require('./liuyao.js');
   const rec = preds.find(p => p.issue === nextCode);
   if(rec){
+    const z = Ziwei.ticket(birthInput, 'ssq', nextCode);
+    rec.tickets = rec.tickets.filter(t => t.name !== '紫微娱乐');
+    rec.tickets.push({name:'紫微娱乐',desc:`${z.ruleVersion} · 命宫${z.chart.mingong} · 身宫${z.chart.shengong} · 娱乐选号`,red:z.red,blue:z.blue,ruleVersion:z.ruleVersion,birthFingerprint:z.birthFingerprint,seed:z.seed,isEntertainment:true});
+    console.log(`紫微娱乐注已更新到 ${nextCode}（fingerprint=${z.birthFingerprint}, seed=${z.seed}）`);
+  }
+  // 六爻占卜注（确定性玄学娱乐）：前九期起卦 + 下期开奖时间起始卦，补进/刷新当期未验证记录
+  const LiuYao = require('./liuyao.js');
+  const zrec = preds.find(p => p.issue === nextCode);
+  if(zrec){
     const lastDate = new Date(merged[0].d.replace(/\(.+$/, ''));
     let add2 = 1;
     while (![0,2,4].includes(new Date(lastDate.getTime() + add2*864e5).getDay())) add2++;
@@ -80,8 +89,8 @@ async function main(){
     const timeInfo = { y: nd.getFullYear(), m: nd.getMonth()+1, d: nd.getDate(), hour: 21 };   // 21:15 开奖
     const g = LiuYao.divine(D.slice(-9), d => [d.r.reduce((a,b)=>a+b,0) % 2 === 1, d.b % 2 === 1],
                             nextCode, {frontMax:33, frontN:6, backMax:16, backN:1}, timeInfo);
-    rec.tickets = rec.tickets.filter(t => t.name !== '🀄 六爻占卜');   // 未开奖前刷新为最新卦象
-    rec.tickets.push({ name:'🀄 六爻占卜',
+    zrec.tickets = zrec.tickets.filter(t => t.name !== '🀄 六爻占卜');   // 未开奖前刷新为最新卦象
+    zrec.tickets.push({ name:'🀄 六爻占卜',
       desc:`前九期起卦${g.timeGua ? ` + 开奖时间起始卦${g.timeGua.name}` : ''}（${g.benGua}${g.bianGua ? '变'+g.bianGua : ''}，玄学娱乐）`,
       red:g.front, blue:g.back[0] });
     console.log(`六爻占卜注已更新到 ${nextCode}（起始卦${g.timeGua ? g.timeGua.name : '—'}，本卦${g.benGua}${g.bianGua?'变'+g.bianGua:''}）`);
@@ -97,6 +106,7 @@ async function main(){
     .replace('__ECHARTS_JS__', () => ec)
     .replace('__CORE_JS__', () => core)
     .replace('__LIUYAO_JS__', () => fs.readFileSync('liuyao.js', 'utf8'))
+    .replace('__ZIWEI_JS__', () => fs.readFileSync('ziwei.js', 'utf8'))
     .replace('__DATA_JSON__', () => fs.readFileSync('data.json', 'utf8'))
     .replace('__PRED_JSON__', () => fs.readFileSync('predictions.json', 'utf8'));
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
