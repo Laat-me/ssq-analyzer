@@ -1198,17 +1198,17 @@ const PRED_HIST = [
     "name": "紫微娱乐",
     "desc": "ziwei-lite-v1 · 命宫疾厄 · 身宫仆役 · 娱乐选号",
     "red": [
-     5,
-     14,
-     17,
+     11,
      21,
-     25,
-     29
+     23,
+     24,
+     26,
+     32
     ],
-    "blue": 4,
+    "blue": 9,
     "ruleVersion": "ziwei-lite-v1",
-    "birthFingerprint": "48bf0037",
-    "seed": 1220476983,
+    "birthFingerprint": "e057383d",
+    "seed": 3763812413,
     "isEntertainment": true
    },
    {
@@ -1631,7 +1631,7 @@ genTickets();
 /* ---------- 紫微娱乐选号（文件记录优先，完整输入摘要） ---------- */
 (function(){
   const z = (PRED_HIST.find(e=>e.issue===nextCode)||{}).tickets?.find(t=>t.name==='紫微娱乐');
-  const input = {calendar:'gregorian',year:1998,month:2,day:3,hour:12,gender:'unknown',timezone:'Asia/Shanghai',location:'未提供'};
+  const input = {calendar:'gregorian',year:1998,month:2,day:3,hour:12,gender:'male',timezone:'Asia/Shanghai',location:'四川广安'};
   const c = Ziwei.chart(input);
   const red = z ? z.red : Ziwei.ticket(input,'ssq',nextCode).red;
   const blue = z ? z.blue : Ziwei.ticket(input,'ssq',nextCode).blue;

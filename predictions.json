@@ -577,17 +577,17 @@
     "name": "紫微娱乐",
     "desc": "ziwei-lite-v1 · 命宫疾厄 · 身宫仆役 · 娱乐选号",
     "red": [
-     5,
-     14,
-     17,
+     11,
      21,
-     25,
-     29
+     23,
+     24,
+     26,
+     32
     ],
-    "blue": 4,
+    "blue": 9,
     "ruleVersion": "ziwei-lite-v1",
-    "birthFingerprint": "48bf0037",
-    "seed": 1220476983,
+    "birthFingerprint": "e057383d",
+    "seed": 3763812413,
     "isEntertainment": true
    },
    {

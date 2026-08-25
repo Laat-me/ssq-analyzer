@@ -62,7 +62,7 @@ async function main(){
   }
   const nextCode = String(Number(merged[0].c) + 1);
   const Ziwei = require('./ziwei.js');
-  const birthInput = {calendar:'gregorian',year:1998,month:2,day:3,hour:12,gender:'unknown',timezone:'Asia/Shanghai',location:'未提供'};
+  const birthInput = {calendar:'gregorian',year:1998,month:2,day:3,hour:12,gender:'male',timezone:'Asia/Shanghai',location:'四川广安'};
   if (!preds.some(p => p.issue === nextCode)){
     const rng = SSQCore.mulberry32(Number(nextCode) || 20260816);
     const tickets = SSQCore.predictTickets(D.length, rng);
