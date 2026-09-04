@@ -7,7 +7,7 @@
 const NR = 33, NB = 16;
 const E30R = 30*6/NR, E30B = 30/NB;
 let REDN, BLUEN, N, FALLr, F30r, F10r, F5r, F300r,
-    BALLb, B30b, B10b, B5b, RFr, RBb, NCFr, NCBb, GFr, GBb;
+    BALLb, B30b, B10b, B5b, RFr, RBb, NCFr, NCBb, GFr, GBb, CPFr, CPBb;
 
 /* ---------- 特征工程 ---------- */
 function cumFreq(arr, maxn, win){
@@ -30,6 +30,21 @@ function neighborCounts(arr, maxn, r){
   for(let k=1;k<=arr.length;k++){
     const cur = new Float64Array(maxn);
     for(const x of arr[k-1]){ const lo=Math.max(1,x-r), hi=Math.min(maxn,x+r); for(let n=lo;n<=hi;n++) cur[n-1]++; cur[x-1]--; }
+    out.push(cur);
+  }
+  return out;
+}
+function crossPrevNeighbor(arr, maxn, radius){
+  /* 跨期邻号（严格）：n 命中「上一期号码 ±1..±radius」且 n 不属于上一期号码集合。
+     按集合排除上期全部原号，与「重号」严格互斥；radius=1 即上期±1。 */
+  const r = radius || 1, out = [new Float64Array(maxn)];
+  for(let k=1;k<=arr.length;k++){
+    const cur = new Float64Array(maxn);
+    const prev = new Set(arr[k-1]);
+    for(let n=1;n<=maxn;n++){
+      if(prev.has(n)) continue;
+      for(const x of prev){ if(Math.abs(n-x)<=r){ cur[n-1]=1; break; } }
+    }
     out.push(cur);
   }
   return out;
@@ -110,6 +125,10 @@ reg('v2_hot','追热','近5×3+近10×1.5+邻域×4+连出×4', k=>({
 reg('AI_U_wide','频次重号邻域','全期频次+重号×0.5+r3邻域×0.2', k=>({
   sf: V.add(V.norm(FALLr,k), V.scale(RFr[k],0.5), V.scale(NCFr[2][k],0.2)),
   sb: V.add(V.norm(BALLb,k), V.scale(RBb[k],0.5), V.scale(NCBb[2][k],0.2))
+}), {constrained:true});
+reg('v5_crossN','频次重号跨期邻号','全期频次+重号×0.5+严格跨期邻号(上期±1)×0.2', k=>({
+  sf: V.add(V.norm(FALLr,k), V.scale(RFr[k],0.5), V.scale(CPFr[k],0.2)),
+  sb: V.add(V.norm(BALLb,k), V.scale(RBb[k],0.5), V.scale(CPBb[k],0.2))
 }), {constrained:true});
 reg('H_dirichlet','贝叶斯','Dirichlet(α=1)平滑频率', k=>({ sf: diri(FALLr[k]), sb: diri(BALLb[k]) }));
 reg('I_recency_eb','指数加权','γ=0.995递减加权(近500期)', k=>{
@@ -201,13 +220,16 @@ function setCoreData(D){
   B10b = cumFreq(BLUEN,NB,10); B5b = cumFreq(BLUEN,NB,5);
   RFr = repeatFlags(REDN,NR); RBb = repeatFlags(BLUEN,NB);
   NCFr = [1,2,3].map(r=>neighborCounts(REDN,NR,r)); NCBb = [1,2,3].map(r=>neighborCounts(BLUEN,NB,r));
+  CPFr = crossPrevNeighbor(REDN,NR,1); CPBb = crossPrevNeighbor(BLUEN,NB,1);   // 严格跨期邻号(上期±1)
   GFr = gapMap(REDN,NR); GBb = gapMap(BLUEN,NB);
 }
 
 const CORE = {
   setCoreData, predictTickets, algoScores, algoRed8, topM, pickRed6, pickRed8, mulberry32,
+  crossPrevNeighbor,
   get REDN(){ return REDN; }, get BLUEN(){ return BLUEN; },
   get N(){ return N; }, get F5r(){ return F5r; },
+  get CPFr(){ return CPFr; }, get CPBb(){ return CPBb; },
   get ALGOS(){ return ALGOS; }
 };
 global.SSQCore = CORE;                                            // 浏览器/Node 全局可用

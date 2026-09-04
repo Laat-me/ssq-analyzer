@@ -506,7 +506,9 @@
      29,
      31
     ],
-    "blue": 14
+    "blue": 14,
+    "redHits": 0,
+    "blueHit": 0
    },
    {
     "name": "🔥 v2_hot 追热流",
@@ -519,7 +521,9 @@
      24,
      25
     ],
-    "blue": 1
+    "blue": 1,
+    "redHits": 1,
+    "blueHit": 0
    },
    {
     "name": "⚖️ v3 冷热组合",
@@ -532,7 +536,9 @@
      28,
      29
     ],
-    "blue": 1
+    "blue": 1,
+    "redHits": 0,
+    "blueHit": 0
    },
    {
     "name": "🧠 AI_U_wide",
@@ -545,7 +551,9 @@
      27,
      29
     ],
-    "blue": 2
+    "blue": 2,
+    "redHits": 2,
+    "blueHit": 0
    },
    {
     "name": "🗳️ K_prob_ensemble",
@@ -558,7 +566,9 @@
      24,
      26
     ],
-    "blue": 15
+    "blue": 15,
+    "redHits": 1,
+    "blueHit": 0
    },
    {
     "name": "🎲 纯随机流（对照）",
@@ -571,7 +581,9 @@
      29,
      33
     ],
-    "blue": 5
+    "blue": 5,
+    "redHits": 2,
+    "blueHit": 0
    },
    {
     "name": "紫微娱乐",
@@ -588,7 +600,9 @@
     "ruleVersion": "ziwei-lite-v1",
     "birthFingerprint": "e057383d",
     "seed": 3763812413,
-    "isEntertainment": true
+    "isEntertainment": true,
+    "redHits": 1,
+    "blueHit": 0
    },
    {
     "name": "🀄 六爻占卜",
@@ -601,7 +615,135 @@
      24,
      30
     ],
+    "blue": 13,
+    "redHits": 1,
+    "blueHit": 0
+   }
+  ],
+  "verified": true,
+  "actual": {
+   "red": [
+    8,
+    16,
+    18,
+    22,
+    25,
+    26
+   ],
+   "blue": 7
+  }
+ },
+ {
+  "issue": "2026103",
+  "time": "2026/9/5 00:19:18",
+  "tickets": [
+   {
+    "name": "🧊 v1_cold 追冷流",
+    "desc": "gap×0.5 + 冷30×2.5 + 全期偏冷×0.3",
+    "red": [
+     11,
+     19,
+     20,
+     21,
+     28,
+     29
+    ],
+    "blue": 14
+   },
+   {
+    "name": "🔥 v2_hot 追热流",
+    "desc": "近5频×3 + 近10频×1.5 + 邻域×4 + 连出×4",
+    "red": [
+     3,
+     4,
+     9,
+     16,
+     22,
+     25
+    ],
+    "blue": 2
+   },
+   {
+    "name": "⚖️ v3 冷热组合",
+    "desc": "v1 冷号池 3 个 + v2 热号池 3 个",
+    "red": [
+     3,
+     4,
+     19,
+     25,
+     28,
+     29
+    ],
+    "blue": 2
+   },
+   {
+    "name": "🧠 AI_U_wide",
+    "desc": "频次+重号×0.5+邻域×0.2，约束枚举（DLT 短窗最优还原版）",
+    "red": [
+     3,
+     4,
+     10,
+     13,
+     16,
+     25
+    ],
+    "blue": 9
+   },
+   {
+    "name": "🗳️ K_prob_ensemble",
+    "desc": "Dirichlet + 指数加权 + 马尔可夫 三算法投票",
+    "red": [
+     2,
+     3,
+     9,
+     13,
+     24,
+     25
+    ],
+    "blue": 15
+   },
+   {
+    "name": "🎲 纯随机流（对照）",
+    "desc": "完全均匀随机，胜率与上面完全相同",
+    "red": [
+     7,
+     8,
+     12,
+     18,
+     23,
+     28
+    ],
     "blue": 13
+   },
+   {
+    "name": "紫微娱乐",
+    "desc": "ziwei-lite-v1 · 命宫疾厄 · 身宫仆役 · 娱乐选号",
+    "red": [
+     7,
+     12,
+     17,
+     21,
+     27,
+     30
+    ],
+    "blue": 11,
+    "ruleVersion": "ziwei-lite-v1",
+    "birthFingerprint": "e057383d",
+    "seed": 3763812413,
+    "isEntertainment": true
+   },
+   {
+    "name": "🀄 六爻占卜",
+    "desc": "前九期起卦 + 开奖时间起始卦天风姤（泽火革变泽天夬，玄学娱乐）",
+    "red": [
+     8,
+     15,
+     17,
+     26,
+     28,
+     32
+    ],
+    "blue": 4
    }
   ]
  }

@@ -166,7 +166,7 @@
   <h2>蓝球近期冷热 <span>近30期 / 近100期出现次数</span></h2>
   <div class="card"><div id="cHotB" class="chart short"></div></div>
 
-  <h2>算法移植回测 <span>移植自 dlt-analyzer 项目 12 个算法 · 最近 400 期前向验证 · 复式 8红+2蓝 · 达标 = 命中≥4</span></h2>
+  <h2>算法移植回测 <span>移植自 dlt-analyzer 项目 13 个算法 · 最近 400 期前向验证 · 复式 8红+2蓝 · 达标 = 命中≥4</span></h2>
   <div class="card"><div id="cAlgo" class="chart"></div></div>
   <div class="card" style="margin-top:16px"><table class="recent" id="algoTable"></table></div>
   <div class="chisq" id="algoConclusion" style="margin-top:10px"></div>
@@ -192,8 +192,10 @@
       <li><b>v2_hot 追热流</b>：红球 近5期频次×3 + 近10期频次×1.5 + 热号±1邻域×4 + 连出(近5期≥2次)×4；蓝球 近5×3 + 近10×1.5。追近期热号。</li>
       <li><b>v3 冷热组合</b>：v1 冷号池取 3 个 + v2 热号池取 3 个；蓝球用 v2。同时押冷热两端。</li>
       <li><b>AI_U_wide</b>：全期频次 + 上期重号×0.5 ±3 邻域×0.2，top12 枚举满足奇偶/区间/和值/跨度约束的组合（dlt-analyzer 短窗口最优算法的还原版）。</li>
+      <li><b>v5_crossN（回测对照）</b>：全期频次 + 重号×0.5 + <b>严格跨期邻号×0.2</b>。“跨期邻号”= 上一期开奖号码 ±1 且不等于上期原号（集合排除重号），与“重号 / 同期连号”分别计数；仅用于回测对照，不进入预测展示。</li>
       <li><b>K_prob_ensemble</b>：Dirichlet 平滑、γ=0.995 指数加权、上期马尔可夫三算法等权投票。</li>
       <li><b>纯随机流（对照）</b>：完全均匀随机 6+1——提醒你它和上面所有“流派”胜率一模一样。</li>
+      <li><b>双窗口独立回测（跨期邻号）</b>：900/100 窗口 v5_crossN 命中≥4 = 4.0%（AI_U_wide 3.0%、随机 4.3%）；长窗口(留出500) v5_crossN = 3.4%，随机理论基线 3.48%——<b>跨期邻号未提供稳定优于随机的增益</b>，与 dlt-analyzer round-28 结论一致，仅保留作对照特征。</li>
     </ol>
     统计学结论：卡方检验与上节回测都表明，热号、冷号、遗漏、重号等指标是随机噪声，不携带未来信息。
   </div>
@@ -599,7 +601,7 @@ const mc = { ge4m:mcMean(mcGe4), ge4s:mcSd(mcGe4), avgm:mcMean(mcAvg), avgs:mcSd
   for(let k=100;k<N;k++){ const top=SSQCore.topM(SSQCore.F5r[k],8); hotFull += SSQCore.REDN[k].filter(n=>top.includes(n)).length; hotFullN++; }
   const hotFullAvg = hotFull/hotFullN;
   document.getElementById('algoConclusion').innerHTML =
-    `<b>回测结论：</b>12 个移植算法在最近 ${HOLD} 期的“命中≥4”比例为 ${(Math.min(...SSQCore.ALGOS.map(a=>BT[a.name].ge4))*100).toFixed(1)}%–${(Math.max(...SSQCore.ALGOS.map(a=>BT[a.name].ge4))*100).toFixed(1)}%，` +
+    `<b>回测结论：</b>${SSQCore.ALGOS.length} 个移植算法在最近 ${HOLD} 期的“命中≥4”比例为 ${(Math.min(...SSQCore.ALGOS.map(a=>BT[a.name].ge4))*100).toFixed(1)}%–${(Math.max(...SSQCore.ALGOS.map(a=>BT[a.name].ge4))*100).toFixed(1)}%，` +
     `随机基线理论值 <b>${(theo.ge4*100).toFixed(2)}%</b>（蒙特卡洛 40 轮均值 ${(mc.ge4m*100).toFixed(2)}% ± ${(mc.ge4s*100).toFixed(2)}%）。` +
     `表现最好的 <b>${best.name}</b> 超出理论基线 ${diff.toFixed(2)} 个百分点，${Math.abs(diff) <= band
       ? `<b>在随机波动带（±2σ≈${band.toFixed(2)}pp）之内</b>，不构成统计显著优势`

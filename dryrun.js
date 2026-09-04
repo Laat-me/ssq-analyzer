@@ -8,6 +8,7 @@ tpl = tpl
   .replace('__ECHARTS_JS__', () => ec)
   .replace('__CORE_JS__', () => core)
   .replace('__LIUYAO_JS__', () => fs.existsSync('liuyao.js') ? fs.readFileSync('liuyao.js', 'utf8') : '')
+  .replace('__ZIWEI_JS__', () => fs.existsSync('ziwei.js') ? fs.readFileSync('ziwei.js', 'utf8') : '')
   .replace('__DATA_JSON__', () => data)
   .replace('__PRED_JSON__', () => pred);
 fs.writeFileSync('双色球分析.html', tpl);
